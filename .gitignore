@@ -1,2 +1,12 @@
 build/
 .vscode/
+.vs/
+
+*.opensdf
+*.sdf
+*.suo
+*.vcxproj.user
+ipch/
+Debug/
+Release/
+x64/

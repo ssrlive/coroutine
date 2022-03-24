@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifdef __unix__
+
 #if __APPLE__ && __MACH__
 	#include <sys/ucontext.h>
 #else 
@@ -190,3 +192,4 @@ coroutine_running(struct schedule * S) {
 	return S->running;
 }
 
+#endif /* __unix__ */

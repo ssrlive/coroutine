@@ -36,6 +36,7 @@ struct schedule * coroutine_open(void) {
 }
 
 void _co_delete(struct coroutine *co) {
+    DeleteFiber(co->fiber_ctx);
     free(co);
 }
 
@@ -45,8 +46,7 @@ void __stdcall fiber_func(void *p) {
     size_t id = co->sch_index;
     assert( (0 <= id) && (id < sch->cap) );
     co->func(sch, co->ud);
-    _co_delete(co);
-    sch->co[id] = NULL;
+    co->status = COROUTINE_DEAD; // Just mark it dead, can't delete it.
     sch->running = -1;
     SwitchToFiber(sch->fiber_ctx);
 }
@@ -78,7 +78,11 @@ void coroutine_close(struct schedule *sch) {
 int coroutine_new(struct schedule *sch, coroutine_func func, void *ud) {
     int id;
     for (id = 0; id < sch->cap; ++id) {
-        if (sch->co[id] == NULL) {
+        struct coroutine *co = sch->co[id];
+        if (co == NULL || co->status == COROUTINE_DEAD) {
+            if (co && co->status == COROUTINE_DEAD) {
+                _co_delete(co);
+            }
             sch->co[id] = _co_new(sch, id, func, ud);
             return id;
         }

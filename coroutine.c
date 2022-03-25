@@ -6,13 +6,12 @@
 #include <string.h>
 #include <stdint.h>
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 
 #if __APPLE__ && __MACH__
-	#include <sys/ucontext.h>
-#else 
-	#include <ucontext.h>
-#endif 
+#define _XOPEN_SOURCE 600
+#endif
+#include <ucontext.h>
 
 #define STACK_SIZE (1024*1024)
 #define DEFAULT_COROUTINE 16
@@ -192,4 +191,4 @@ coroutine_running(struct schedule * S) {
 	return S->running;
 }
 
-#endif /* __unix__ */
+#endif /* defined(__unix__) || defined(__APPLE__) */
